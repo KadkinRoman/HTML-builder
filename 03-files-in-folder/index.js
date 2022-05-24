@@ -1,38 +1,26 @@
-var fs = require('fs');
-var path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-// var getFiles = function (dir, files_){
+const secretPath = path.join(__dirname, "secret-folder");
 
-//   files_ = files_ || [];
-//     var files = fs.readdirSync(dir);
-//     for (var i in files){
-//         var name = dir + '/' + files[i];
-//         if (fs.statSync(name).isDirectory()){
-//             getFiles(name, files_);
-//         } else {
-//             files_.push(name);
-//         }
-//     }
-//     return files_;
-// };
+fs.readdir(secretPath, (err, files) => {
+  if (err) throw err;
 
-// console.log(getFiles(path.join(__dirname, 'secret-folder')));
+  for (let index in files) {
+    fs.stat(path.join(secretPath, files[index]), function (err, stat) {
+      if (err) console.log(err);
 
-var files = fs.readdirSync(path.join(__dirname, 'secret-folder'));
-console.log(files);
-
-for (let file in files) {
-    console.log('G');
-    fs.stat(file, function(err, stat) {
-
-        if (err) return err;
-        console.log('Проверка', stat.isDirectory(path.join(__dirname, 'secret-folder', files[file])));
-        console.log('G');
-        if (stat.isDirectory(path.join(__dirname, 'secret-folder', files[file]))) {
-            console.log('Не папка');
-        } else {
-            console.log(file);
-        }
+      if (stat.isFile(path.join(secretPath, files[index]))) {
+        console.log(
+          `${path.basename(
+            path.join(secretPath, files[index]),
+            path.extname(path.join(secretPath, files[index]))
+          )} - ` +
+            `${path.extname(path.join(secretPath, files[index])).slice(1)} - ` +
+            `${stat.size / 1024}kb
+            `
+        );
+      }
     });
-
-}
+  }
+});
